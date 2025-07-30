@@ -5,14 +5,7 @@ namespace Loda
 {
     class Program
     {
-        private static MenuUI menu;
-
-        // Hàm tái tạo menu, truyền engine
-        public static void RebuildMenu(Engine engine)
-        {
-            menu = new MenuUI(Localization.T("AppTitle"), Constanst.CreateMenuItems(), 0, 0, 64);
-            engine.UIManager.SetDrawAction(() => menu.DrawMenu());
-        }
+        private static MenuUI menu = new(Localization.T("AppTitle"), Constanst.CreateMenuItems(), 0, 0, 64);
 
         static void Main(string[] args)
         {
@@ -21,10 +14,13 @@ namespace Loda
             ConsoleHelper.EnableCtrlCExit();
 
             var engine = new Engine();
-            RebuildMenu(engine);
+            engine.UIManager.SetDrawAction(() => menu.DrawMenu());
 
             // Đăng ký callback đổi ngôn ngữ để tái tạo menu
-            Localization.OnLanguageChanged += () => RebuildMenu(engine);
+            Localization.OnLanguageChanged += () =>
+            {
+                menu = new MenuUI(Localization.T("AppTitle"), Constanst.CreateMenuItems(), 0, 0, 64);
+            };
 
             engine.OnUpdate += _ =>
             {

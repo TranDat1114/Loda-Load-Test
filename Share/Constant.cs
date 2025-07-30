@@ -32,11 +32,13 @@ public static class Constanst
             new MenuItem(Localization.T("English"), () => {
                 Localization.SetLanguage(AppLanguage.English);
                 Console.WriteLine(Localization.T("Language") + ": English");
+                Console.WriteLine("\n" + Localization.T("ReturnToMainMenuToChangeLanguage"));
                 Console.ReadKey(true);
             }),
             new MenuItem(Localization.T("Vietnamese"), () => {
                 Localization.SetLanguage(AppLanguage.Vietnamese);
                 Console.WriteLine(Localization.T("Language") + ": Vietnamese");
+                Console.WriteLine("\n" + Localization.T("ReturnToMainMenuToChangeLanguage"));
                 Console.ReadKey(true);
             })
         }

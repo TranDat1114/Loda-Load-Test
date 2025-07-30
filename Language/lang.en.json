@@ -21,5 +21,6 @@
   "AboutText": "Loda Load Test Engine\nAuthor: Tran Phu Dat (TranDat1114)\nGithub: https://github.com/TranDat1114\nPress any key to return to menu.",
   "Language": "Language",
   "Vietnamese": "Vietnamese",
-  "English": "English"
+  "English": "English",
+  "ReturnToMainMenuToChangeLanguage": "Return to main menu to change language"
 }

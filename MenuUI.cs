@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Loda
@@ -7,14 +5,14 @@ namespace Loda
     public class MenuItem
     {
         public string Title { get; set; }
-        public Action OnSelect { get; set; }
-        public MenuUI SubMenu { get; set; }
+        public Action? OnSelect { get; set; }
+        public MenuUI? SubMenu { get; set; }
 
-        public MenuItem(string title, Action onSelect = null, MenuUI subMenu = null)
+        public MenuItem(string title, Action? onSelect = null, MenuUI? subMenu = null)
         {
             Title = title;
-            OnSelect = onSelect;
-            SubMenu = subMenu;
+            if (onSelect != null) OnSelect = onSelect;
+            if (subMenu != null) SubMenu = subMenu;
         }
     }
 
@@ -61,7 +59,7 @@ namespace Loda
         public void DrawMenu()
         {
             _buffer.Clear();
-            bool prevCursorVisible = Console.CursorVisible;
+            bool prevCursorVisible = !OperatingSystem.IsWindows() || Console.CursorVisible;
             Console.CursorVisible = false;
             Console.SetCursorPosition(_left, _top);
             // Top border

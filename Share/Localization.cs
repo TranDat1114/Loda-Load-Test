@@ -8,7 +8,7 @@ namespace Loda.Share
     public static class Localization
     {
         // Sự kiện đổi ngôn ngữ
-        public static event Action OnLanguageChanged;
+        public static event Action? OnLanguageChanged;
     
         public static AppLanguage CurrentLanguage { get; set; } = AppLanguage.English;
 

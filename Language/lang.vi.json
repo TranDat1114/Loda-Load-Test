@@ -21,5 +21,6 @@
   "AboutText": "Loda Load Test Engine\nTác giả: Trần Phú Đạt (TranDat1114)\nGithub: https://github.com/TranDat1114\nNhấn phím bất kỳ để quay lại menu.",
   "Language": "Ngôn ngữ",
   "Vietnamese": "Tiếng Việt",
-  "English": "English"
+  "English": "English",
+  "ReturnToMainMenuToChangeLanguage": "Quay lại menu chính để thay đổi ngôn ngữ"
 }

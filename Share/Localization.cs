@@ -1,13 +1,15 @@
 
+using System;
 using System.Collections.Generic;
 using Loda.Share.Enum;
 
 namespace Loda.Share
 {
-
-
     public static class Localization
     {
+        // Sự kiện đổi ngôn ngữ
+        public static event Action OnLanguageChanged;
+    
         public static AppLanguage CurrentLanguage { get; set; } = AppLanguage.English;
 
         private static Dictionary<string, string> _en = new();
@@ -42,8 +44,10 @@ namespace Loda.Share
         public static void SetLanguage(AppLanguage lang)
         {
             CurrentLanguage = lang;
+            Load(); // Nạp lại file ngôn ngữ ngay khi đổi ngôn ngữ
             SettingHelper.Current.Language = lang;
             SettingHelper.Save();
+            OnLanguageChanged?.Invoke();
         }
     }
 }

@@ -5,7 +5,7 @@ namespace Loda.Share;
 public static class Constanst
 {
     // Hàm tạo menu LoadStrategy
-    private static MenuUI CreateLoadStrategyMenu() => MenuUI.CreateSubMenu(
+    public static MenuUI CreateLoadStrategyMenu() => MenuUI.CreateSubMenu(
         Localization.T("LoadStrategy"),
         new List<MenuItem>
         {
@@ -25,7 +25,7 @@ public static class Constanst
     );
 
     // Hàm tạo menu Language
-    private static MenuUI CreateLanguageMenu() => MenuUI.CreateSubMenu(
+    public static MenuUI CreateLanguageMenu() => MenuUI.CreateSubMenu(
         Localization.T("Language"),
         new List<MenuItem>
         {
@@ -43,7 +43,7 @@ public static class Constanst
     );
 
     // Submenu cho Settings
-    public static readonly MenuUI SettingsMenu = MenuUI.CreateSubMenu(
+    public static MenuUI CreateSettingsMenu() => MenuUI.CreateSubMenu(
         Localization.T("Settings"),
         new List<MenuItem>
         {
@@ -76,7 +76,7 @@ public static class Constanst
         }
     );
 
-    public static readonly List<MenuItem> menuItems = new List<MenuItem>
+    public static List<MenuItem> CreateMenuItems() => new List<MenuItem>
     {
         new MenuItem(Localization.T("NewTest"), () => {
             Console.WriteLine("[New Test] ...");
@@ -90,7 +90,7 @@ public static class Constanst
             Console.WriteLine("[Saved Tests] ...");
             Console.ReadKey(true);
         }),
-        new MenuItem(Localization.T("Settings"), () => {}, SettingsMenu),
+        new MenuItem(Localization.T("Settings"), () => {}, CreateSettingsMenu()),
         new MenuItem(Localization.T("AboutHelp"), () => {
             Console.WriteLine(Localization.T("AboutText"));
             Console.ReadKey(true);

@@ -105,6 +105,29 @@ namespace Loda
 
         public void HandleInput(ConsoleKeyInfo key)
         {
+            // Hỗ trợ chọn nhanh bằng phím số
+            if (char.IsDigit(key.KeyChar))
+            {
+                int idx = -1;
+                if (key.KeyChar == '0')
+                {
+                    // 0 luôn là Back hoặc Exit (cuối danh sách)
+                    idx = _items.Count - 1;
+                }
+                else
+                {
+                    int num = key.KeyChar - '1';
+                    if (num >= 0 && num < _items.Count - 1)
+                        idx = num;
+                }
+                if (idx >= 0 && idx < _items.Count)
+                {
+                    _selectedIndex = idx;
+                    // Giả lập Enter
+                    HandleInput(new ConsoleKeyInfo('\r', ConsoleKey.Enter, false, false, false));
+                    return;
+                }
+            }
             switch (key.Key)
             {
                 case ConsoleKey.UpArrow:

@@ -12,4 +12,13 @@
     <Folder Include="Language\" />
   </ItemGroup>
 
+
+  <ItemGroup>
+    <None Update="Language\lang.en.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Language\lang.vi.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

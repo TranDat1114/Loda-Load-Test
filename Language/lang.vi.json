@@ -18,9 +18,10 @@
   "EnterValue": "Nhập giá trị:",
   "PressAnyKey": "Nhấn phím bất kỳ để tiếp tục...",
   "AppTitle": "Menu kiểm thử tải Loda",
-  "AboutText": "Loda Load Test Engine\nTác giả: Trần Phú Đạt (TranDat1114)\nGithub: https://github.com/TranDat1114\nNhấn phím bất kỳ để quay lại menu.",
+  "AboutText": "Loda Load Test Engine\nTác giả: Trần Phú Đạt (TranDat1114)\nGithub: https://github.com/TranDat1114",
   "Language": "Ngôn ngữ",
   "Vietnamese": "Tiếng Việt",
   "English": "English",
-  "ReturnToMainMenuToChangeLanguage": "Quay lại menu chính để thay đổi ngôn ngữ"
+  "ReturnToMainMenuToChangeLanguage": "Quay lại menu chính để thay đổi ngôn ngữ",
+  "PressAnyKeyToReturn": "Nhấn phím bất kỳ để quay lại menu."
 }

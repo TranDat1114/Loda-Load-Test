@@ -1,7 +1,7 @@
 using System;
 
-namespace Loda.Share
-{
+namespace Loda.Share;
+
     public static class ConsoleHelper
     {
         public static void SetupConsole(int width = 64)
@@ -22,4 +22,4 @@ namespace Loda.Share
             };
         }
     }
-}
+

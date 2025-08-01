@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using Loda.Share.Enum;
 
-namespace Loda.Share
-{
+namespace Loda.Share;
+
     public static class Localization
     {
         // Sự kiện đổi ngôn ngữ
@@ -50,4 +50,4 @@ namespace Loda.Share
             OnLanguageChanged?.Invoke();
         }
     }
-}
+

@@ -1,144 +1,144 @@
 using System.Text;
+using Loda.Components;
 
-namespace Loda
+namespace Loda;
+
+public class MenuItem
 {
-    public class MenuItem
-    {
-        public string Title { get; set; }
-        public Action? OnSelect { get; set; }
-        public MenuUI? SubMenu { get; set; }
+    public string Title { get; set; }
+    public Action? OnSelect { get; set; }
+    public MenuUI? SubMenu { get; set; }
 
-        public MenuItem(string title, Action? onSelect = null, MenuUI? subMenu = null)
+    public MenuItem(string title, Action? onSelect = null, MenuUI? subMenu = null)
+    {
+        Title = title;
+        if (onSelect != null) OnSelect = onSelect;
+        if (subMenu != null) SubMenu = subMenu;
+    }
+}
+
+// Kế thừa BaseSelectionComponent để đồng bộ UI selection/pagination
+public class MenuUI : BaseSelectionComponent<MenuItem>
+{
+    private int _selectedIndex;
+    private readonly int _top, _left;
+    public bool IsActive { get; private set; } = true;
+
+    public MenuUI(string title, List<MenuItem> items, int left = 0, int top = 0, int width = 64, bool isSubMenu = false)
+        : base(isSubMenu ? new List<MenuItem>(items) { new MenuItem(Share.Localization.T("Back"), () => { }) } : items, x => x.Title, title, width)
+    {
+        _selectedIndex = 0;
+        _pageIndex = 0;
+        _left = left;
+        _top = top;
+        if (isSubMenu)
         {
-            Title = title;
-            if (onSelect != null) OnSelect = onSelect;
-            if (subMenu != null) SubMenu = subMenu;
+            // Đảm bảo Back luôn là mục cuối cùng, OnSelect sẽ set IsActive=false
+            _items[^1].OnSelect = () => { IsActive = false; };
         }
     }
 
+    public static MenuUI CreateSubMenu(string title, List<MenuItem> items, int left = 0, int top = 0, int width = 64)
+        => new MenuUI(title, items, left, top, width, true);
 
-    public class MenuUI
+    public void DrawMenu()
     {
-        private readonly List<MenuItem> _items;
-        private int _selectedIndex;
-        private readonly int _top;
-        private readonly int _left;
-        private readonly int _width;
-        private readonly string _title;
-        private readonly StringBuilder _buffer;
-        public bool IsActive { get; private set; } = true;
-
-        public MenuUI(string title, List<MenuItem> items, int left = 0, int top = 0, int width = 64, bool isSubMenu = false)
+        var buffer = DrawHeader();
+        int totalItems = _items.Count - 1;
+        int startIdx = StartIdx;
+        int endIdx = EndIdx > totalItems ? totalItems : EndIdx;
+        for (int i = startIdx; i < endIdx; i++)
         {
-            _title = title;
-            // Nếu là submenu thì tự động thêm lựa chọn Back cuối cùng
-            if (isSubMenu)
-            {
-                _items = new List<MenuItem>(items)
-                {
-                    new MenuItem(Share.Localization.T("Back"), () => { IsActive = false; })
-                };
-            }
+            int displayIdx = i - startIdx + 1;
+            string prefix = (_selectedIndex == i ? "> " : "  ") + $"{displayIdx}. ";
+            string line = prefix + _items[i].Title;
+            if (line.Length > _width - 4) line = line[..(_width - 4)];
+            line = line.PadRight(_width - 4);
+            if (_selectedIndex == i)
+                buffer.AppendLine($"║ \u001b[7m{line}\u001b[0m ║");
             else
+                buffer.AppendLine($"║ {line} ║");
+        }
+        // Back/Exit cuối cùng, số 0
+        string backPrefix = _selectedIndex == _items.Count - 1 ? "> 0. " : "  0. ";
+        string backLine = backPrefix + _items[^1].Title;
+        if (backLine.Length > _width - 4) backLine = backLine[..(_width - 4)];
+        backLine = backLine.PadRight(_width - 4);
+        if (_selectedIndex == _items.Count - 1)
+            buffer.AppendLine($"║ \u001b[7m{backLine}\u001b[0m ║");
+        else
+            buffer.AppendLine($"║ {backLine} ║");
+        DrawPageInfo(buffer);
+        DrawFooter(buffer);
+        Console.SetCursorPosition(_left, _top);
+        Console.Write(buffer.ToString());
+    }
+
+    public void HandleInput(ConsoleKeyInfo key)
+    {
+        int totalItems = _items.Count - 1;
+        int startIdx = StartIdx;
+        int endIdx = EndIdx > totalItems ? totalItems : EndIdx;
+        DrawMenu();
+        var keyPressed = key; 
+        if (char.IsDigit(keyPressed.KeyChar))
+        {
+            int num = keyPressed.KeyChar - '0';
+            if (num == 0)
             {
-                _items = items;
+                _selectedIndex = _items.Count - 1;
             }
-            _selectedIndex = 0;
-            _left = left;
-            _top = top;
-            _width = width;
-            _buffer = new StringBuilder();
-        }
-
-        // Hàm tiện ích tạo submenu
-        public static MenuUI CreateSubMenu(string title, List<MenuItem> items, int left = 0, int top = 0, int width = 64)
-        {
-            return new MenuUI(title, items, left, top, width, true);
-        }
-
-        public void DrawMenu()
-        {
-            _buffer.Clear();
-            bool prevCursorVisible = !OperatingSystem.IsWindows() || Console.CursorVisible;
-            Console.CursorVisible = false;
-            Console.SetCursorPosition(_left, _top);
-            // Top border
-            _buffer.AppendLine($"╔{new string('═', _width - 2)}╗");
-            // Title centered
-            int titlePad = (_width - 2 - _title.Length) / 2;
-            string titleLine = new string(' ', titlePad) + _title + new string(' ', _width - 2 - _title.Length - titlePad);
-            _buffer.AppendLine($"║{titleLine}║");
-            // Separator
-            _buffer.AppendLine($"╠{new string('═', _width - 2)}╣");
-            // Menu items
-            for (int i = 0; i < _items.Count; i++)
+            else if (num >= 1 && num <= PageSize)
             {
-                string prefix;
-                // Xác định nút Back hoặc Exit để đánh số 0
-                var isBack = i == _items.Count - 1 && _items[i].Title == Share.Localization.T("Back");
-                var isExit = i == _items.Count - 1 && _items[i].Title == Share.Localization.T("Exit");
-                if (isBack || isExit)
-                    prefix = "0. ";
-                else
-                    prefix = $"{i + 1}. ";
-                if (i == _selectedIndex) prefix = "> " + prefix;
-                else prefix = "  " + prefix;
-                string title = _items[i].Title;
-                string line = prefix + title;
-                if (line.Length > _width - 4) line = line.Substring(0, _width - 4);
-                line = line.PadRight(_width - 4);
-                if (i == _selectedIndex)
-                    _buffer.AppendLine($"║ \u001b[7m{line}\u001b[0m ║"); // highlight
-                else
-                    _buffer.AppendLine($"║ {line} ║");
-            }
-            // Bottom border
-            _buffer.AppendLine($"╚{new string('═', _width - 2)}╝");
-            Console.SetCursorPosition(_left, _top);
-            Console.Write(_buffer.ToString());
-            // Chỉ hiện lại con trỏ khi menu không còn active
-            if (!IsActive)
-                Console.CursorVisible = prevCursorVisible;
-        }
-
-        public void HandleInput(ConsoleKeyInfo key)
-        {
-            // Hỗ trợ chọn nhanh bằng phím số
-            if (char.IsDigit(key.KeyChar))
-            {
-                int idx = -1;
-                if (key.KeyChar == '0')
-                {
-                    // 0 luôn là Back hoặc Exit (cuối danh sách)
-                    idx = _items.Count - 1;
-                }
-                else
-                {
-                    int num = key.KeyChar - '1';
-                    if (num >= 0 && num < _items.Count - 1)
-                        idx = num;
-                }
-                if (idx >= 0 && idx < _items.Count)
+                int idx = startIdx + num - 1;
+                if (idx < endIdx)
                 {
                     _selectedIndex = idx;
-                    // Giả lập Enter
-                    HandleInput(new ConsoleKeyInfo('\r', ConsoleKey.Enter, false, false, false));
-                    return;
                 }
             }
-            switch (key.Key)
+        }
+        else
+        {
+            switch (keyPressed.Key)
             {
+                case ConsoleKey.LeftArrow:
+                    if (_pageIndex > 0)
+                    {
+                        _pageIndex--;
+                        _selectedIndex = _pageIndex * PageSize;
+                    }
+                    break;
+                case ConsoleKey.RightArrow:
+                    if (_pageIndex < TotalPages - 1)
+                    {
+                        _pageIndex++;
+                        _selectedIndex = _pageIndex * PageSize;
+                    }
+                    break;
                 case ConsoleKey.UpArrow:
-                    _selectedIndex = (_selectedIndex - 1 + _items.Count) % _items.Count;
+                    if (_selectedIndex == _items.Count - 1)
+                        _selectedIndex = endIdx - 1;
+                    else if (_selectedIndex > startIdx)
+                        _selectedIndex--;
                     break;
                 case ConsoleKey.DownArrow:
-                    _selectedIndex = (_selectedIndex + 1) % _items.Count;
+                    if (_selectedIndex == endIdx - 1)
+                        _selectedIndex = _items.Count - 1;
+                    else if (_selectedIndex < endIdx - 1)
+                        _selectedIndex++;
                     break;
                 case ConsoleKey.Enter:
                     var item = _items[_selectedIndex];
-                    if (item.SubMenu != null)
+                    if (_selectedIndex == _items.Count - 1)
                     {
-                        Console.Clear(); // Chỉ clear khi chuyển sang menu mới
+                        item.OnSelect?.Invoke();
+                        // Chỉ set IsActive = false nếu là Exit
+                        if (item.Title == Share.Localization.T("Exit"))
+                            IsActive = false;
+                    }
+                    else if (item.SubMenu != null)
+                    {
+                        Console.Clear();
                         item.SubMenu.Reset();
                         while (item.SubMenu.IsActive)
                         {
@@ -148,28 +148,31 @@ namespace Loda
                                 var subKey = Console.ReadKey(true);
                                 item.SubMenu.HandleInput(subKey);
                             }
-                            Thread.Sleep(10);
+                            System.Threading.Thread.Sleep(10);
                         }
-                        Console.Clear(); // Clear khi quay lại menu cha
+                        Console.Clear();
                         DrawMenu();
                     }
                     else
                     {
                         item.OnSelect?.Invoke();
-                        IsActive = false;
+                        // Chỉ set IsActive = false nếu là Exit
+                        if (item.Title == Share.Localization.T("Exit"))
+                            IsActive = false;
                     }
                     break;
                 case ConsoleKey.Escape:
-                    // Nếu là menu con thì chỉ back về menu cha, không exit toàn bộ
                     IsActive = false;
                     break;
             }
         }
+    }
 
-        public void Reset()
-        {
-            _selectedIndex = 0;
-            IsActive = true;
-        }
+    public void Reset()
+    {
+        _selectedIndex = 0;
+        _pageIndex = 0;
+        IsActive = true;
     }
 }
+

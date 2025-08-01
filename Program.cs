@@ -1,43 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
 using Loda.Share;
-namespace Loda
+namespace Loda;
+
+class Program
 {
-    class Program
+    private static MenuUI menu = new(Localization.T("AppTitle"), Constanst.CreateMenuItems(), 0, 0, 64);
+
+    static void Main(string[] args)
     {
-        private static MenuUI menu = new(Localization.T("AppTitle"), Constanst.CreateMenuItems(), 0, 0, 64);
+        SettingHelper.Load();
+        ConsoleHelper.SetupConsole(64);
+        ConsoleHelper.EnableCtrlCExit();
 
-        static void Main(string[] args)
+        var engine = new Engine();
+        engine.UIManager.SetDrawAction(() => menu.DrawMenu());
+
+        // Đăng ký callback đổi ngôn ngữ để tái tạo menu
+        Localization.OnLanguageChanged += () =>
         {
-            SettingHelper.Load();
-            ConsoleHelper.SetupConsole(64);
-            ConsoleHelper.EnableCtrlCExit();
+            menu = new MenuUI(Localization.T("AppTitle"), Constanst.CreateMenuItems(), 0, 0, 64);
+        };
 
-            var engine = new Engine();
-            engine.UIManager.SetDrawAction(() => menu.DrawMenu());
-
-            // Đăng ký callback đổi ngôn ngữ để tái tạo menu
-            Localization.OnLanguageChanged += () =>
+        engine.OnUpdate += _ =>
+        {
+            if (menu.IsActive && Console.KeyAvailable)
             {
-                menu = new MenuUI(Localization.T("AppTitle"), Constanst.CreateMenuItems(), 0, 0, 64);
-            };
-
-            engine.OnUpdate += _ =>
+                var key = Console.ReadKey(true);
+                menu.HandleInput(key);
+            }
+            else if (!menu.IsActive)
             {
-                if (menu.IsActive && Console.KeyAvailable)
+                // Nếu mục hiện tại là Exit thì gọi OnSelect để thoát
+                var items = Constanst.CreateMenuItems();
+                var exitItem = items.FindLast(i => i.Title == Loda.Share.Localization.T("Exit"));
+                if (menu != null && exitItem != null && menu.IsActive == false)
                 {
-                    var key = Console.ReadKey(true);
-                    menu.HandleInput(key);
+                    // Kiểm tra nếu menu đang ở main menu và mục Exit được chọn
+                    exitItem.OnSelect?.Invoke();
                 }
-                else if (!menu.IsActive)
-                {
-                    menu.Reset();
-                }
-            };
+                menu!.Reset();
+            }
+        };
 
-            engine.OnRender += () => { /* UIManager sẽ tự vẽ menu qua SetDrawAction */ };
+        engine.OnRender += () => { /* UIManager sẽ tự vẽ menu qua SetDrawAction */ };
 
-            engine.Run();
-        }
+        engine.Run();
     }
 }

@@ -18,9 +18,10 @@
   "EnterValue": "Enter value:",
   "PressAnyKey": "Press any key to continue...",
   "AppTitle": "Loda Load Test Menu",
-  "AboutText": "Loda Load Test Engine\nAuthor: Tran Phu Dat (TranDat1114)\nGithub: https://github.com/TranDat1114\nPress any key to return to menu.",
+  "AboutText": "Loda Load Test Engine\nAuthor: Tran Phu Dat (TranDat1114)\nGithub: https://github.com/TranDat1114",
   "Language": "Language",
   "Vietnamese": "Vietnamese",
   "English": "English",
-  "ReturnToMainMenuToChangeLanguage": "Return to main menu to change language"
+  "ReturnToMainMenuToChangeLanguage": "Return to main menu to change language",
+  "PressAnyKeyToReturn": "Press any key to return to the menu."
 }

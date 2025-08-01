@@ -82,14 +82,17 @@ public static class Constanst
     {
         new MenuItem(Localization.T("NewTest"), () => {
             Console.WriteLine("[New Test] ...");
+            Console.WriteLine("\n" + Localization.T("PressAnyKeyToReturn"));
             Console.ReadKey(true);
         }),
         new MenuItem(Localization.T("RunTest"), () => {
             Console.WriteLine("[Run Test] ...");
+            Console.WriteLine("\n" + Localization.T("PressAnyKeyToReturn"));
             Console.ReadKey(true);
         }),
         new MenuItem(Localization.T("SavedTests"), () => {
             Console.WriteLine("[Saved Tests] ...");
+            Console.WriteLine("\n" + Localization.T("PressAnyKeyToReturn"));
             Console.ReadKey(true);
         }),
         // Internal: Test Local Components
@@ -97,6 +100,7 @@ public static class Constanst
         new MenuItem(Localization.T("Settings"), () => {}, CreateSettingsMenu()),
         new MenuItem(Localization.T("AboutHelp"), () => {
             Console.WriteLine(Localization.T("AboutText"));
+            Console.WriteLine("\n" + Localization.T("PressAnyKeyToReturn"));
             Console.ReadKey(true);
         }),
         new MenuItem(Localization.T("Exit"), () => {
@@ -114,6 +118,18 @@ public static class Constanst
                 var multi = new Components.MultiSelectionComponent<string>(items, s => s, "Select fruits");
                 var selected = multi.Show();
                 Console.WriteLine("Selected: " + string.Join(", ", selected));
+                Console.WriteLine("Press any key to return...");
+                Console.ReadKey(true);
+            }),
+            new MenuItem("Selection (Pagination Test)", () => {
+                var items = new List<string>();
+                for (int i = 1; i <= 20; i++) items.Add($"Item {i}");
+                var selector = new Components.SelectionComponent<string>(items, s => s, "Select one (pagination test)");
+                int idx = selector.Show();
+                if (idx >= 0)
+                    Console.WriteLine($"Selected: {items[idx]}");
+                else
+                    Console.WriteLine("No selection.");
                 Console.WriteLine("Press any key to return...");
                 Console.ReadKey(true);
             })

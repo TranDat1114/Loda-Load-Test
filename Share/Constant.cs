@@ -92,6 +92,8 @@ public static class Constanst
             Console.WriteLine("[Saved Tests] ...");
             Console.ReadKey(true);
         }),
+        // Internal: Test Local Components
+        new MenuItem("Test Local Components", () => {}, CreateTestComponentMenu()),
         new MenuItem(Localization.T("Settings"), () => {}, CreateSettingsMenu()),
         new MenuItem(Localization.T("AboutHelp"), () => {
             Console.WriteLine(Localization.T("AboutText"));
@@ -101,4 +103,20 @@ public static class Constanst
             Environment.Exit(0);
         })
     };
+
+    // Submenu test các component nội bộ
+    public static MenuUI CreateTestComponentMenu() => MenuUI.CreateSubMenu(
+        "Test Local Components",
+        new List<MenuItem>
+        {
+            new MenuItem("Multi Selection", () => {
+                var items = new List<string> { "Apple", "Banana", "Orange", "Grape", "Mango" };
+                var multi = new Components.MultiSelectionComponent<string>(items, s => s, "Select fruits");
+                var selected = multi.Show();
+                Console.WriteLine("Selected: " + string.Join(", ", selected));
+                Console.WriteLine("Press any key to return...");
+                Console.ReadKey(true);
+            })
+        }
+    );
 }
